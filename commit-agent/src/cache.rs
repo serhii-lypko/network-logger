@@ -1,29 +1,36 @@
+use std::collections::HashMap;
 use tokio::sync::mpsc::Receiver;
+
+use log::debug;
 
 // TODO: tests?
 
-// TODO: commitment logging?
-
 pub struct Cache {
-    // TODO: design cache data structure
     rx: Receiver<String>,
+    storage: HashMap<String, u32>,
 }
 
 impl Cache {
     pub fn new(rx: Receiver<String>) -> Self {
-        Cache { rx }
+        Cache {
+            rx,
+            storage: HashMap::new(),
+        }
     }
 
     pub async fn process_messages(&mut self) {
         while let Some(message) = self.rx.recv().await {
-            println!(
-                "Hello fucking world! Message recieved god damn {:?}",
-                message
-            );
+            // algorithm: update cache, check it's size; if overflow -> commit and clear.
+
+            // NOTE: tricky thing -> commit may take a while (API call). also it can fail.
+            // so how to release the cache for new writes and not lost the data?
+
+            debug!("Processing the message...");
         }
     }
 
-    pub fn commit() {
+    // TODO: error handling
+    pub async fn commit(&self) {
         todo!()
     }
 }

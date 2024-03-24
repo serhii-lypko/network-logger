@@ -6,6 +6,8 @@ use tokio::task;
 use pnet::datalink::{self, Channel};
 use pnet::packet::{ethernet, ip, ipv4, udp, Packet};
 
+use log::error;
+
 use crate::dns_parser::DNSParser;
 
 const ETHERNET_INTERFACE: &str = "en0";
@@ -52,13 +54,15 @@ impl PacketsListener {
                                         let payload = udp_packet.payload();
                                         // let dns = DNSParser::parse_packet(payload);
 
+                                        // TODO: what else except DNS name could be send?
+
                                         // TODO
                                         match tx
                                             .try_send(String::from("hello world fucking message!"))
                                         {
                                             Ok(_) => (),
                                             Err(e) => {
-                                                eprintln!("Failed to send message: {}", e);
+                                                error!("Failed to send message: {}", e);
                                             }
                                         }
                                     }

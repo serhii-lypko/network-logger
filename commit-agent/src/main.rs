@@ -12,17 +12,25 @@ mod cache;
 mod dns_parser;
 mod packets_listener;
 
-use tokio::sync::mpsc;
-
 use std::sync::Arc;
+use tokio::sync::mpsc;
 
 use cache::Cache;
 use packets_listener::PacketsListener;
+
+use log::info;
+use std::env;
 
 // TODO: program performance, CPU and memory usage metrics
 
 #[tokio::main]
 async fn main() {
+    // TODO: load envs from config
+    env::set_var("RUST_LOG", "debug");
+    env_logger::init();
+
+    info!("Starting commit agent service");
+
     let (tx, rx) = mpsc::channel(64);
 
     let listener = PacketsListener::new(Arc::new(tx));
