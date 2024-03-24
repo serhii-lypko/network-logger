@@ -1,0 +1,13 @@
+api-server/target/
+commit-agent/target/
+
+**/target/
+**/*.rs.bk
+
+Cargo.lock
+
+.vscode/
+.idea/
+
+.DS_Store
+Thumbs.db
