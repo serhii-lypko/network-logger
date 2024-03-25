@@ -3,7 +3,7 @@
 
     1. Extract DNS records from network traffic
     2. Write to in-memory cache. When cache bound overflows -> init commit and clean cache.
-    3. Implement commit logic
+    3. Implement commit logic (Api Key auth?) + (use protobuf instead of JSON? - https://github.com/actix/examples/blob/master/protobuf)
 */
 
 extern crate pnet;
@@ -22,6 +22,8 @@ use packets_listener::PacketsListener;
 
 use log::info;
 use std::env;
+
+// NOTE: the program will not work as expected with VPN turned on for obvious reasons
 
 // TODO: program performance, CPU and memory usage metrics
 

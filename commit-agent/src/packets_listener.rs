@@ -56,17 +56,15 @@ impl PacketsListener {
                                         || udp_packet.get_source() == DNS_PORT
                                     {
                                         let payload = udp_packet.payload();
-                                        // let dns = DNSParser::parse_packet(payload);
-
-                                        // TODO: what else except DNS name could be send?
-
-                                        // TODO
-                                        match tx
-                                            .try_send(String::from("hello world fucking message!"))
-                                        {
-                                            Ok(_) => (),
+                                        match DNSParser::parse_packet(payload) {
+                                            Ok(dns) => match tx.try_send(dns) {
+                                                Ok(_) => (),
+                                                Err(e) => {
+                                                    error!("Failed to send message: {}", e);
+                                                }
+                                            },
                                             Err(e) => {
-                                                error!("Failed to send message: {}", e);
+                                                error!("Failed to parse DNS from the payload {:?} with error {}", payload, e);
                                             }
                                         }
                                     }
