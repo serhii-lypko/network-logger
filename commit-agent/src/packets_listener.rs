@@ -6,6 +6,8 @@ use tokio::task;
 use pnet::datalink::{self, Channel};
 use pnet::packet::{ethernet, ip, ipv4, udp, Packet};
 
+use anyhow::Result;
+
 use log::error;
 
 use crate::dns_parser::DNSParser;
@@ -22,8 +24,7 @@ impl PacketsListener {
         PacketsListener { tx }
     }
 
-    // TODO: error handling
-    pub async fn listen(&self) {
+    pub async fn listen(&self) -> Result<()> {
         let tx = self.tx.clone();
 
         let worker = task::spawn_blocking(move || {
@@ -43,7 +44,10 @@ impl PacketsListener {
             loop {
                 match rx.next() {
                     Ok(packet) => {
-                        let ethernet = ethernet::EthernetPacket::new(packet).unwrap();
+                        let ethernet = match ethernet::EthernetPacket::new(packet) {
+                            Some(packet) => packet,
+                            None => continue, // Skip packets that can't be parsed
+                        };
 
                         if let Some(packet) = ipv4::Ipv4Packet::new(ethernet.payload()) {
                             if packet.get_next_level_protocol() == ip::IpNextHeaderProtocols::Udp {
@@ -77,6 +81,8 @@ impl PacketsListener {
             }
         });
 
-        worker.await.unwrap();
+        worker.await?;
+
+        Ok(())
     }
 }

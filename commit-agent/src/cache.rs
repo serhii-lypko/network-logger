@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use tokio::sync::mpsc::Receiver;
 
+use anyhow::Result;
+
 use log::debug;
 
 // TODO: tests?
@@ -29,8 +31,8 @@ impl Cache {
         }
     }
 
-    // TODO: error handling
-    pub async fn commit(&self) {
+    // TODO: create http service?
+    pub async fn commit(&self) -> Result<()> {
         todo!()
     }
 }

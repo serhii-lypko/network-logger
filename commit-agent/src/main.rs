@@ -15,6 +15,8 @@ mod packets_listener;
 use std::sync::Arc;
 use tokio::sync::mpsc;
 
+use anyhow::Result;
+
 use cache::Cache;
 use packets_listener::PacketsListener;
 
@@ -23,8 +25,10 @@ use std::env;
 
 // TODO: program performance, CPU and memory usage metrics
 
+// NOTE: how to re-run program when laptop goes to sleep? -> use launchd? (a Launch Agent or Daemon)
+
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<()> {
     // TODO: load envs from config
     env::set_var("RUST_LOG", "debug");
     env_logger::init();
@@ -35,11 +39,10 @@ async fn main() {
 
     let listener = PacketsListener::new(Arc::new(tx));
 
-    tokio::spawn(async move {
-        listener.listen().await;
-    });
+    tokio::spawn(async move { listener.listen().await });
 
     let mut cache = Cache::new(rx);
-    // FIXME -> naming
     cache.process_messages().await;
+
+    Ok(())
 }
