@@ -27,7 +27,7 @@ impl Cache {
             // NOTE: tricky thing -> commit may take a while (API call). also it can fail.
             // so how to release the cache for new writes and not lost the data?
 
-            debug!("Processing the message...");
+            debug!("Processing the message: {}", message);
         }
     }
 

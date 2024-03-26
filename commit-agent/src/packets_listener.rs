@@ -56,6 +56,7 @@ impl PacketsListener {
                                         || udp_packet.get_source() == DNS_PORT
                                     {
                                         let payload = udp_packet.payload();
+
                                         match DNSParser::parse_packet(payload) {
                                             Ok(dns) => match tx.try_send(dns) {
                                                 Ok(_) => (),

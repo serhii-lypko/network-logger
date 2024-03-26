@@ -2,21 +2,37 @@ use anyhow::Result;
 
 pub struct DNSParser;
 
-// TODO: tests
-
 impl DNSParser {
-    // TODO: does need to return Result?
-    // TODO: this algorithm has to be very fast and efficient
-    // TODO: zero copy parsing?
+    // TODO: zero copy parsing? -> can be improved using Bytes crate?
+    // https://itnext.io/rust-the-joy-of-safe-zero-copy-parsers-8c8581db8ab2
+
     pub fn parse_packet(packet_payload: &[u8]) -> Result<String> {
-        dbg!(packet_payload);
+        let question_section: &[u8] = &packet_payload[12..];
 
-        // let a = 10;
-        // let b = String::from("heyl");
+        // two pointers algorithm
+        let mut curr_dilimiter = 0;
+        let mut next_dilimiter = question_section[curr_dilimiter] as usize + 1;
 
-        // let c = a + b;
+        let mut is_parsed = false;
 
-        return Ok(String::from("mock"));
+        // TODO: is it possible to avoid using heap allocation?
+        let mut result: Vec<&str> = vec![];
+
+        while !is_parsed && next_dilimiter < question_section.len() {
+            if question_section[next_dilimiter] == 0 {
+                is_parsed = true;
+            }
+
+            let segment =
+                std::str::from_utf8(&question_section[curr_dilimiter + 1..next_dilimiter])?;
+
+            result.push(segment);
+
+            curr_dilimiter = next_dilimiter;
+            next_dilimiter += question_section[next_dilimiter] as usize + 1;
+        }
+
+        Ok(result.join("."))
     }
 }
 
@@ -27,31 +43,14 @@ mod tests {
     #[test]
     fn test_dns_query_parsing() {
         let payload = [
-            176, 118, 129, 128, 0, 1, 0, 4, 0, 0, 0, 0, //
-            //
-            4, 109, 105, 114, 111, 3, 99, 111, 109, //
-            //
-            0, 0, 1, 0, 1, 192, 12, 0, 1, 0, 1, 0, 0, 0, 60, 0, 4, 108, 157, 109, 49, 192, 12, 0, 1,
-            0, 1, 0, 0, 0, 60, 0, 4, 108, 157, 109, 66, 192, 12, 0, 1, 0, 1, 0, 0, 0, 60, 0, 4,
-            108, 157, 109, 17, 192, 12, 0, 1, 0, 1, 0, 0, 0, 60, 0, 4, 108, 157, 109, 78,
+            116, 100, 129, 128, 0, 1, 0, 0, 0, 1, 0, 0, 4, 112, 108, 97, 121, 6, 103, 111, 111,
+            103, 108, 101, 3, 99, 111, 109, 0, 0, 65, 0, 1, 192, 17, 0, 6, 0, 1, 0, 0, 0, 59, 0,
+            38, 3, 110, 115, 49, 192, 17, 9, 100, 110, 115, 45, 97, 100, 109, 105, 110, 192, 17,
+            36, 225, 222, 251, 0, 0, 3, 132, 0, 0, 3, 132, 0, 0, 7, 8, 0, 0, 0, 60,
         ];
 
-        let sliced = &payload[12..];
+        let parsed_dns = DNSParser::parse_packet(&payload).unwrap();
 
-        let is_parsed = false;
-
-        let mut curr_len = sliced[0];
-        let mut curr_index = sliced[1];
-
-        // TODO: ideally it's better to avoid any heap memory allocation?
-        let mut segments: Vec<String> = vec![];
-        let mut curr_segment = String::from("");
-
-        // when encounter zero -> stop; else
-
-        while !is_parsed {}
-
-        dbg!(sliced);
-        println!("------- ------- -------");
+        assert_eq!(parsed_dns, String::from("play.google.com"));
     }
 }
