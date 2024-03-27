@@ -1,14 +1,14 @@
 /*
     -- Implementation Plan --
 
-    1. Extract DNS records from network traffic
-    2. Write to in-memory cache. When cache bound overflows -> init commit and clean cache.
+    1. ✅ Extract DNS records from network traffic
+    2. Write to the buffer. When cache bound overflows -> init commit and clean cache.
     3. Implement commit logic (Api Key auth?) + (use protobuf instead of JSON? - https://github.com/actix/examples/blob/master/protobuf)
 */
 
 extern crate pnet;
 
-mod cache;
+mod commiter;
 mod dns_parser;
 mod packets_listener;
 
@@ -17,11 +17,13 @@ use tokio::sync::mpsc;
 
 use anyhow::Result;
 
-use cache::Cache;
+use commiter::Commiter;
 use packets_listener::PacketsListener;
 
 use log::info;
 use std::env;
+
+// Maket it work, make it right, make it fast
 
 // NOTE: the program will not work as expected with VPN turned on for obvious reasons
 
@@ -43,8 +45,8 @@ async fn main() -> Result<()> {
 
     tokio::spawn(async move { listener.listen().await });
 
-    let mut cache = Cache::new(rx);
-    cache.process_messages().await;
+    let mut cache = Commiter::new(rx);
+    cache.process_messages().await?;
 
     Ok(())
 }

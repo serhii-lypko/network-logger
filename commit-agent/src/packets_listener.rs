@@ -3,6 +3,8 @@ use std::sync::Arc;
 use tokio::sync::mpsc::Sender;
 use tokio::task;
 
+use bytes::Bytes;
+
 use pnet::datalink::{self, Channel};
 use pnet::packet::{ethernet, ip, ipv4, udp, Packet};
 
@@ -10,17 +12,15 @@ use anyhow::Result;
 
 use log::error;
 
-use crate::dns_parser::DNSParser;
-
 const ETHERNET_INTERFACE: &str = "en0";
 const DNS_PORT: u16 = 53;
 
 pub struct PacketsListener {
-    tx: Arc<Sender<String>>,
+    tx: Arc<Sender<Bytes>>,
 }
 
 impl PacketsListener {
-    pub fn new(tx: Arc<Sender<String>>) -> Self {
+    pub fn new(tx: Arc<Sender<Bytes>>) -> Self {
         PacketsListener { tx }
     }
 
@@ -55,18 +55,10 @@ impl PacketsListener {
                                     if udp_packet.get_destination() == DNS_PORT
                                         || udp_packet.get_source() == DNS_PORT
                                     {
-                                        let payload = udp_packet.payload();
+                                        let payload = Bytes::copy_from_slice(udp_packet.payload());
 
-                                        match DNSParser::parse_packet(payload) {
-                                            Ok(dns) => match tx.try_send(dns) {
-                                                Ok(_) => (),
-                                                Err(e) => {
-                                                    error!("Failed to send message: {}", e);
-                                                }
-                                            },
-                                            Err(e) => {
-                                                error!("Failed to parse DNS from the payload {:?} with error {}", payload, e);
-                                            }
+                                        if let Err(err) = tx.try_send(payload) {
+                                            error!("Failed to send packet to commiter: {}", err);
                                         }
                                     }
                                 }

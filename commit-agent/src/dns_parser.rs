@@ -6,6 +6,7 @@ impl DNSParser {
     // TODO: zero copy parsing? -> can be improved using Bytes crate?
     // https://itnext.io/rust-the-joy-of-safe-zero-copy-parsers-8c8581db8ab2
 
+    // TODO: potentially better to perform on the server?
     pub fn parse_packet(packet_payload: &[u8]) -> Result<String> {
         let question_section: &[u8] = &packet_payload[12..];
 
