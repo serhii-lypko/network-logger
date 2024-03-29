@@ -1,17 +1,29 @@
 [package]
-name = "commit-agent"
+name = "network-logger"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "grpc-server"
+path = "src/server.rs"
+
+[[bin]]
+name = "grpc-client"
+path = "src/client.rs"
 
 [dependencies]
 anyhow = "1.0.81"
 bytes = "1.6.0"
+chrono = "0.4.37"
 env_logger = "0.11.3"
 log = "0.4.21"
+prost = "0.12.3"
 tokio = { version = "1.36.0", features = ["full"] }
+tonic = "0.11.0"
 
 
 [dependencies.pnet]
 version = "0.34.0"
+
+[build-dependencies]
+tonic-build = "0.11.0"
