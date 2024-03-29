@@ -1,27 +1,23 @@
-/*
-    -- Implementation Plan --
+// extern crate pnet;
 
-    1. ✅ Extract DNS records from network traffic
-    2. Write to the buffer. When cache bound overflows -> init commit and clean cache.
-    3. Implement commit logic (Api Key auth?) + (use protobuf instead of JSON? - https://github.com/actix/examples/blob/master/protobuf)
-*/
+// pub mod commiter;
+// pub mod dns_parser;
+// pub mod packets_listener;
 
-extern crate pnet;
-
-mod commiter;
-mod dns_parser;
-mod packets_listener;
-
-use std::sync::Arc;
-use tokio::sync::mpsc;
+// use std::sync::Arc;
+// use tokio::sync::mpsc;
 
 use anyhow::Result;
 
-use commiter::Commiter;
-use packets_listener::PacketsListener;
+// use commiter::Commiter;
+// use packets_listener::PacketsListener;
 
-use log::info;
-use std::env;
+// use log::info;
+// use std::env;
+
+// pub mod packet_transfer {
+//     tonic::include_proto!("packet_transfer");
+// }
 
 // Maket it work, make it right, make it fast
 
@@ -34,19 +30,19 @@ use std::env;
 #[tokio::main]
 async fn main() -> Result<()> {
     // TODO: load envs from config
-    env::set_var("RUST_LOG", "debug");
-    env_logger::init();
+    // env::set_var("RUST_LOG", "debug");
+    // env_logger::init();
 
-    info!("Starting commit agent service");
+    // info!("Starting commit agent service");
 
-    let (tx, rx) = mpsc::channel(64);
+    // let (tx, rx) = mpsc::channel(64);
 
-    let listener = PacketsListener::new(Arc::new(tx));
+    // let listener = PacketsListener::new(Arc::new(tx));
 
-    tokio::spawn(async move { listener.listen().await });
+    // tokio::spawn(async move { listener.listen().await });
 
-    let mut cache = Commiter::new(rx);
-    cache.process_messages().await?;
+    // let mut commiter = Commiter::new(rx);
+    // commiter.process_messages().await?;
 
     Ok(())
 }
