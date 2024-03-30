@@ -1,7 +1,7 @@
 syntax = "proto3";
 package packet_transfer;
 
-message PacketData {
+message PacketsData {
     bytes packets = 1;
     int64 timestamp = 2;
 }
@@ -10,6 +10,6 @@ message TransferAck {
     string message = 1;
 }
 
-service PacketTransfer {
-    rpc TransferPackets (PacketData) returns (TransferAck);
+service PacketsTransfer {
+    rpc TransferPackets (PacketsData) returns (TransferAck);
 }

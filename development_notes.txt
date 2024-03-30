@@ -1,0 +1,12 @@
+-- Building plan --
+
+- gRPC client-server communication and message passing
+- server parses packets bytes and creates valid entities
+- server writes entities to the postgres database. design data collection semantics
+- deploy server part with database to aws
+- test client-server communication with local client and remote server
+- authentication
+- run local client as a daemon
+- build an API as an actix web server? data aggregation with endpoints
+- client metrics & performance measurements
+- possible optimizations & improvements

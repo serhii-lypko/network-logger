@@ -1,9 +1,9 @@
 use tonic::{transport::Server, Request, Response, Status};
 
-use packet_transfer::packet_transfer_server::{PacketTransfer, PacketTransferServer};
-use packet_transfer::{PacketData, TransferAck};
+use packets_transfer::packets_transfer_server::{PacketsTransfer, PacketsTransferServer};
+use packets_transfer::{PacketsData, TransferAck};
 
-pub mod packet_transfer {
+pub mod packets_transfer {
     tonic::include_proto!("packet_transfer");
 }
 
@@ -11,14 +11,15 @@ pub mod packet_transfer {
 pub struct PacketTransferService {}
 
 #[tonic::async_trait]
-impl PacketTransfer for PacketTransferService {
+impl PacketsTransfer for PacketTransferService {
     async fn transfer_packets(
         &self,
-        request: Request<PacketData>,
+        request: Request<PacketsData>,
     ) -> Result<Response<TransferAck>, Status> {
-        println!("Got a request: {:?}", request);
+        println!("Got packets: {:?}", request);
+        println!("-------------");
 
-        let reply = packet_transfer::TransferAck {
+        let reply = packets_transfer::TransferAck {
             message: "Acknowledge the packet transfer".to_string(),
         };
 
@@ -32,7 +33,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let service = PacketTransferService::default();
 
     Server::builder()
-        .add_service(PacketTransferServer::new(service))
+        .add_service(PacketsTransferServer::new(service))
         .serve(addr)
         .await?;
 

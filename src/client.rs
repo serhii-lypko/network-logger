@@ -5,12 +5,12 @@ use tokio::sync::mpsc;
 use commiter::Commiter;
 use packets_listener::PacketsListener;
 
-use packet_transfer::packet_transfer_client::PacketTransferClient;
-use packet_transfer::PacketData;
+use packets_transfer::packets_transfer_client::PacketsTransferClient;
+use packets_transfer::PacketsData;
 
 extern crate pnet;
 
-pub mod packet_transfer {
+pub mod packets_transfer {
     tonic::include_proto!("packet_transfer");
 }
 
@@ -34,7 +34,8 @@ async fn main() -> Result<()> {
 
     tokio::spawn(async move { listener.listen().await });
 
-    let grpc_client = PacketTransferClient::connect("http://0.0.0.0:50051").await?;
+    // TODO: env for a port?
+    let grpc_client = PacketsTransferClient::connect("http://0.0.0.0:50051").await?;
 
     let mut commiter = Commiter::new(grpc_client, rx);
     commiter.process_messages().await?;
