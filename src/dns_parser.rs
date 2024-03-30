@@ -1,13 +1,30 @@
 use anyhow::Result;
 
+// TODO: avoid constants declaration duplication
+pub const UDP_MESSAGE_BYTES_DELIMITER: u8 = 0x1E;
+
 pub struct DNSParser;
 
 impl DNSParser {
-    // TODO: zero copy parsing? -> can be improved using Bytes crate?
-    // https://itnext.io/rust-the-joy-of-safe-zero-copy-parsers-8c8581db8ab2
+    pub fn parse_packets(bytes: Vec<u8>) -> Vec<String> {
+        let packets: Vec<&[u8]> = bytes
+            .split(|&byte| byte == UDP_MESSAGE_BYTES_DELIMITER)
+            .collect();
 
-    // TODO: potentially better to perform on the server?
-    pub fn parse_packet(packet_payload: &[u8]) -> Result<String> {
+        let dns_records: Vec<String> = packets
+            .iter()
+            .filter_map(|&packet| match Self::parse_packet(packet) {
+                Ok(parsed_str) if !parsed_str.is_empty() => Some(parsed_str),
+                _ => None,
+            })
+            .collect();
+
+        dns_records
+    }
+
+    // TODO: zero copy parsing?
+    // https://itnext.io/rust-the-joy-of-safe-zero-copy-parsers-8c8581db8ab2
+    fn parse_packet(packet_payload: &[u8]) -> Result<String> {
         let question_section: &[u8] = &packet_payload[12..];
 
         // two pointers algorithm

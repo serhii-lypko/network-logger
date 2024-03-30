@@ -10,8 +10,8 @@ use crate::PacketsData;
 
 // TODO: tests?
 
-const BUFFER_LIMIT: usize = 500; // TODO
-const DELIMITER: u8 = 0x1E;
+const BUFFER_LIMIT: usize = 2500; // TODO appropriate size?
+pub const UDP_MESSAGE_BYTES_DELIMITER: u8 = 0x1E;
 
 pub struct Commiter {
     // NOTE: is a configuration deadlock safe?
@@ -35,24 +35,20 @@ impl Commiter {
 
     pub async fn process_messages(&mut self) -> Result<()> {
         while let Some(message) = self.rx.recv().await {
-            let buff_size = self.write_to_buffer(message);
+            self.buffer.put(message);
+            let buff_size = self.buffer.len();
 
             if buff_size > BUFFER_LIMIT {
                 debug!("Commit buffered packets...");
 
                 self.commit().await?;
                 self.buffer.clear();
+            } else {
+                self.buffer.put_u8(UDP_MESSAGE_BYTES_DELIMITER);
             }
         }
 
         Ok(())
-    }
-
-    fn write_to_buffer(&mut self, message: Bytes) -> usize {
-        self.buffer.put(message);
-        self.buffer.put_u8(DELIMITER);
-
-        self.buffer.len()
     }
 
     async fn commit(&mut self) -> Result<()> {

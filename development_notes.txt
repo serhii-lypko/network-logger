@@ -1,6 +1,6 @@
 -- Building plan --
 
-- gRPC client-server communication and message passing
+- ✅ gRPC client-server communication and message passing
 - server parses packets bytes and creates valid entities
 - server writes entities to the postgres database. design data collection semantics
 - deploy server part with database to aws
