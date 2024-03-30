@@ -3,10 +3,18 @@
 - ✅ gRPC client-server communication and message passing
 - ✅ server parses packets bytes and creates valid entities
 - server writes entities to the postgres database. design data collection semantics
-- deploy server part with database to aws
-- test client-server communication with local client and remote server
 - authentication
 - run local client as a daemon
-- build an API as an actix web server? data aggregation with endpoints
+- local testing of e2e working system
 - client metrics & performance measurements
+- deploy server part with database to aws
+- build an API as an actix web server? data aggregation with endpoints
 - possible optimizations & improvements
+
+
+Possible next features:
+- send data size alog with dns?
+
+
+RDS password
+RBoDxDrjIj+UXtM3
