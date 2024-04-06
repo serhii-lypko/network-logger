@@ -10,7 +10,8 @@ use crate::PacketsData;
 
 // TODO: tests?
 
-const BUFFER_LIMIT: usize = 2500; // TODO appropriate size?
+// const BUFFER_LIMIT: usize = 2500; // TODO appropriate size?
+const BUFFER_LIMIT: usize = 500;
 pub const UDP_MESSAGE_BYTES_DELIMITER: u8 = 0x1E;
 
 pub struct Commiter {
@@ -39,7 +40,7 @@ impl Commiter {
             let buff_size = self.buffer.len();
 
             if buff_size > BUFFER_LIMIT {
-                debug!("Commit buffered packets...");
+                debug!("Commit buffered packets");
 
                 self.commit().await?;
                 self.buffer.clear();
